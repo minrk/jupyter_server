@@ -339,7 +339,7 @@ def is_namespace_package(namespace: str) -> bool | None:
     return isinstance(spec.submodule_search_locations, _NamespacePath)
 
 
-def filefind(filename: str, path_dirs: Sequence[str] | str) -> str:
+def filefind(filename: str, path_dirs: Sequence[str]) -> str:
     """Find a file by looking through a sequence of paths.
 
     For use in FileFindHandler.
@@ -356,10 +356,9 @@ def filefind(filename: str, path_dirs: Sequence[str] | str) -> str:
     ----------
     filename : str
         The filename to look for. Must be a relative path.
-    path_dirs : str, or sequence of str
-        The sequence of paths to look in for the file.  If a string, the string is
-        put into a sequence and the searched.  If a sequence, walk through
-        each element and join with ``filename``.
+    path_dirs : sequence of str
+        The sequence of paths to look in for the file.
+        Walk through each element and join with ``filename``.
         Only after ensuring the path resolves within the directory is it checked for existence.
 
     Returns
@@ -372,9 +371,6 @@ def filefind(filename: str, path_dirs: Sequence[str] | str) -> str:
     if file_path.is_absolute():
         msg = f"{filename} is absolute, filefind only accepts relative paths."
         raise OSError(msg)
-
-    if isinstance(path_dirs, str):
-        path_dirs = (path_dirs,)
 
     for path_str in path_dirs:
         path = Path(path_str).absolute()
@@ -389,7 +385,7 @@ def filefind(filename: str, path_dirs: Sequence[str] | str) -> str:
             # points outside root, e.g. via `filename='../foo'`
             continue
         # make sure we don't call is_file before we know it's a file within a prefix
-        # GHSA-hrw6-wg82-cm62 – can leak password hash on windows.
+        # GHSA-hrw6-wg82-cm62 - can leak password hash on windows.
         if test_path.is_file():
             return os.path.abspath(test_path)
 
