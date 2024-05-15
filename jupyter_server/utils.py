@@ -386,9 +386,10 @@ def filefind(filename: str, path_dirs: Sequence[str] | str) -> str:
             # can use is_relative_to when we require Python 3.9
             test_path.relative_to(path)
         except ValueError:
-            # points outside root, e..g via `filename='../foo'`
+            # points outside root, e.g. via `filename='../foo'`
             continue
         # make sure we don't call is_file before we know it's a file within a prefix
+        # GHSA-hrw6-wg82-cm62 – can leak password hash on windows.
         if test_path.is_file():
             return os.path.abspath(test_path)
 
